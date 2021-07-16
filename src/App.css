@@ -80,6 +80,7 @@ body {
   width: 29px;
   height: 29px;
   background: #6bc5bc;
+  border-radius: 3px;
   margin-right: 10px;
 }
 
@@ -95,6 +96,10 @@ body {
   color: rgba(0, 0, 0, 0.65);
   font-weight: 600;
   margin-bottom: 10px;
+}
+
+.content .search {
+  display: flex;
 }
 
 .content .checker input {
@@ -120,9 +125,17 @@ body {
   cursor: pointer;
   box-shadow: 0;
   transition: box-shadow 0.15s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.content .checker button:hover {
+.content .checker button:disabled {
+  background: rgba(0, 0, 0, 0.5);
+  cursor: not-allowed;
+}
+
+.content .checker button:not(:disabled):hover {
   box-shadow: 0px 3px 7px 0px rgba(61, 97, 255, 0.27),
     0 0 1px 1px rgba(0, 0, 0, 0.11);
 }
@@ -131,45 +144,79 @@ body {
         TABLE
    =============== */
 
-div.history {
+div.table.history {
   text-align: center;
   width: 100%;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 14px;
 }
-.divTable.history .divTableCell,
-.divTable.history .divTableHead {
+.table a {
+  color: inherit;
+  text-decoration: none;
+}
+.table a:hover {
+  text-decoration: underline;
+}
+.table.history .table-cell,
+.table.history .table-head {
   border: none;
 }
-.divTable.history .divTableBody .divTableCell {
-  color: #000;
+.table.history .table-body .table-cell {
   background: #fff;
 }
 
-.divTable.history .divTableHeading .divTableHead {
-  color: #000;
+.table.history .table-heading .table-head {
   text-align: center;
 }
-.divTable {
+.table {
   display: table;
 }
-.divTableHead {
+.table-head {
   padding: 10px;
 }
-.divTableRow {
+.table-row {
   display: table-row;
 }
-.divTableHeading {
+.table-heading {
   display: table-header-group;
 }
-.divTableCell,
-.divTableHead {
+.table-cell,
+.table-head {
   display: table-cell;
 }
-.divTableHeading {
+.table-headeading {
   display: table-header-group;
 }
-.divTableFoot {
+.table-foot {
   display: table-footer-group;
 }
-.divTableBody {
+.table-body {
   display: table-row-group;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.05);
+}
+.table-cell {
+  padding: 20px;
+}
+
+.table svg {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+}
+
+.table .tags span {
+  background: #1565c0;
+  color: #fff;
+  margin-right: 5px;
+  padding: 3px 5px;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.table .cloudstatus span {
+  background: #d0021b;
+  color: #fff;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 10px;
 }
