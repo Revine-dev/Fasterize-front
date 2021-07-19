@@ -8,21 +8,22 @@ import axios from "axios";
 function App() {
   const [url, setUrl] = useState("");
   const [searchHistory, setSearchHistory] = useState(
-    localStorage.getItem("history") || []
+    JSON.parse(localStorage.getItem("history")) || []
   );
   const [isLoading, setIsLoading] = useState(false);
-
-  console.log(searchHistory);
 
   const addToHistory = (link, result) => {
     let search = [...searchHistory];
     search.push({
       url: link,
+      date: new Date().toLocaleDateString(),
       result: result,
     });
     setSearchHistory(search);
-    localStorage.setItem("history", search);
+    localStorage.setItem("history", JSON.stringify(search));
   };
+
+  console.log(searchHistory);
 
   const handleSearch = async () => {
     setIsLoading(true);
@@ -35,15 +36,15 @@ function App() {
             ? "http://" + url
             : url,
       });
-      console.log(search);
+      addToHistory(url, search.data);
     } catch (error) {
-      if (error.request.status === 400 && error.response.data?.plugged) {
-        addToHistory(url, error.response.data);
+      if (error.request.status === 400) {
+        return addToHistory(url, error.response.data);
       }
-      console.log(error.response, Object.keys(error));
+      console.log(error.response.data, Object.keys(error));
       // handle error
     } finally {
-      //setUrl("");
+      setUrl("");
       setIsLoading(false);
     }
   };
@@ -64,7 +65,13 @@ function App() {
           <div className="title-content">Header Debugger</div>
           <div className="checker">
             <div className="name">Url to checker</div>
-            <div className="search">
+            <form
+              className="search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+            >
               <input
                 type="text"
                 className="uri_checker"
@@ -73,6 +80,7 @@ function App() {
                 placeholder="https://www.fasterize.com"
               />
               <button
+                type="submit"
                 onClick={handleSearch}
                 disabled={
                   isLoading ||
@@ -83,12 +91,12 @@ function App() {
               >
                 {isLoading ? <Loading /> : "Launch analysis"}
               </button>
-            </div>
+            </form>
           </div>
 
           <div className="title-content">History</div>
 
-          {searchHistory.length > 1 && (
+          {searchHistory.length > 0 && (
             <div className="table history">
               <div className="table-heading">
                 <div className="table-row">
@@ -101,29 +109,29 @@ function App() {
                 </div>
               </div>
               <div className="table-body">
-                <div className="table-row">
-                  <div className="table-cell">16/07/2021</div>
-                  <div className="table-cell">
-                    <a
-                      href="https://www.fasterize.com"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      https://www.fasterize.com
-                    </a>
-                  </div>
-                  <div className="table-cell">
-                    <Cloud color="green" />
-                  </div>
-                  <div className="table-cell tags">
-                    <span>Optimisé</span>
-                    <span>Caché</span>
-                  </div>
-                  <div className="table-cell cloudstatus">
-                    <span>MISS</span>
-                  </div>
-                  <div className="table-cell">Paris</div>
-                </div>
+                {searchHistory.map((search, i) => {
+                  return (
+                    <div className="table-row" key={i}>
+                      <div className="table-cell">{search.date}</div>
+                      <div className="table-cell">
+                        <a href={search.url} target="_blank" rel="noreferrer">
+                          {search.url}
+                        </a>
+                      </div>
+                      <div className="table-cell">
+                        <Cloud color={search.plugged ? "green" : "red"} />
+                      </div>
+                      <div className="table-cell tags">
+                        <span>Optimisé</span>
+                        <span>Caché</span>
+                      </div>
+                      <div className="table-cell cloudstatus">
+                        <span>MISS</span>
+                      </div>
+                      <div className="table-cell">Paris</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
