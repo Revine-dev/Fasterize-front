@@ -29,7 +29,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const search = await axios.post("https://fasterize-back.vercel.app/", {
+      const search = await axios.post("http://localhost:3100/", {
         url:
           url.match(/^((http|https):\/\/)?(www\.)?([A-z]+)\.([A-z]{2,})/) &&
           !url.match(/^http/)
@@ -129,7 +129,14 @@ function App() {
                       </div>
                       <div className="table-cell">
                         {search.result.error ? (
-                          <span className="error">Error</span>
+                          <span className="error">
+                            {search.result.message &&
+                            search.result.message.match(
+                              /^getaddrinfo ENOTFOUND /
+                            )
+                              ? "Not Found"
+                              : "Error"}
+                          </span>
                         ) : (
                           <Cloud
                             color={
