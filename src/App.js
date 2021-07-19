@@ -29,7 +29,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const search = await axios.post("http://localhost:3100/", {
+      const search = await axios.post("https://fasterize-back.vercel.app/", {
         url:
           url.match(/^((http|https):\/\/)?(www\.)?([A-z]+)\.([A-z]{2,})/) &&
           !url.match(/^http/)
