@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 import Cloud from "./components/Cloud";
 import Logo from "./components/Logo";
@@ -6,6 +6,7 @@ import Loading from "./components/Loading";
 import axios from "axios";
 
 function App() {
+  const ref = useRef();
   const [url, setUrl] = useState("");
   const [searchHistory, setSearchHistory] = useState(
     JSON.parse(localStorage.getItem("history")) || []
@@ -21,9 +22,8 @@ function App() {
     });
     setSearchHistory(search);
     localStorage.setItem("history", JSON.stringify(search));
+    ref.current.scrollIntoView({ behavior: "smooth" });
   };
-
-  console.log(searchHistory);
 
   const handleSearch = async () => {
     setIsLoading(true);
@@ -41,8 +41,7 @@ function App() {
       if (error.request.status === 400) {
         return addToHistory(url, error.response.data);
       }
-      console.log(error.response.data, Object.keys(error));
-      // handle error
+      addToHistory(url, { error: true, message: error.message });
     } finally {
       setUrl("");
       setIsLoading(false);
@@ -114,27 +113,65 @@ function App() {
                     <div className="table-row" key={i}>
                       <div className="table-cell">{search.date}</div>
                       <div className="table-cell">
-                        <a href={search.url} target="_blank" rel="noreferrer">
-                          {search.url}
+                        <a
+                          href={
+                            search.url.match(/^http/)
+                              ? search.url
+                              : "https://" + search.url
+                          }
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {search.url
+                            .replace(/^https?:\/\//, "")
+                            .replace(/\/$/, "")}
                         </a>
                       </div>
                       <div className="table-cell">
-                        <Cloud color={search.plugged ? "green" : "red"} />
+                        {search.result.error ? (
+                          <span className="error">Error</span>
+                        ) : (
+                          <Cloud
+                            color={
+                              !search.result.plugged
+                                ? "red"
+                                : search.result.fstrzFlags.indexOf(
+                                    "Optimisée"
+                                  ) !== -1
+                                ? "green"
+                                : "orange"
+                            }
+                          />
+                        )}
                       </div>
-                      <div className="table-cell tags">
-                        <span>Optimisé</span>
-                        <span>Caché</span>
-                      </div>
-                      <div className="table-cell cloudstatus">
-                        <span>MISS</span>
-                      </div>
-                      <div className="table-cell">Paris</div>
+                      {search.result.plugged ? (
+                        <>
+                          <div className="table-cell tags">
+                            {search.result.fstrzFlags.map((tag) => {
+                              return <span key={tag}>{tag}</span>;
+                            })}
+                          </div>
+                          <div className="table-cell cloudstatus">
+                            <span>{search.result.cloudfrontStatus}</span>
+                          </div>
+                          <div className="table-cell">
+                            {search.result.cloudfrontPOP}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="table-cell"></div>
+                          <div className="table-cell"></div>
+                          <div className="table-cell"></div>
+                        </>
+                      )}
                     </div>
                   );
                 })}
               </div>
             </div>
           )}
+          <div ref={ref}></div>
         </div>
       </div>
     </div>
