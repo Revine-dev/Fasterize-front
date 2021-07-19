@@ -130,8 +130,8 @@ function App() {
                       <div className="table-cell">
                         {search.result.error ? (
                           <span className="error">
-                            {search.result.message &&
-                            search.result.message.match(
+                            {search.result.error.message &&
+                            search.result.error.message.match(
                               /^getaddrinfo ENOTFOUND /
                             )
                               ? "Not Found"
